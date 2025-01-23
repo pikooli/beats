@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Common } from '@/components/canvas/Common';
@@ -19,13 +19,11 @@ interface GameProps {
 export const Game = ({ videoRef }: GameProps) => {
   const { camera, scene } = useThree();
   const { position } = useLeva();
+  const instanceRef = useRef<THREE.InstancedMesh>(null);
 
-  const cubeRefs = useRef(
-    GAME_CUBES.map(() => ({
-      ref: null as THREE.Mesh<
-        THREE.BoxGeometry,
-        THREE.MeshBasicMaterial
-      > | null,
+  const cubesDataRef = useRef(
+    GAME_CUBES.map((cube) => ({
+      id: cube.id,
       direction: new THREE.Vector3(),
       targetPosition: new THREE.Vector3(),
       hasPassedTarget: false,
@@ -33,59 +31,60 @@ export const Game = ({ videoRef }: GameProps) => {
     }))
   );
 
-  // const directionRef = useRef(new THREE.Vector3());
-  // const targetPositionRef = useRef(new THREE.Vector3());
-  // const hasPassedTarget = useRef(false);
-
   useEffect(() => {
-    if (cubeRefs.current) {
-      cubeRefs.current.forEach((cube, index) => {
-        setTimeout(() => {
-          cube.targetPosition = new THREE.Vector3(
-            POSITIONS_TARGETS[GAME_CUBES[index].target].x,
-            POSITIONS_TARGETS[GAME_CUBES[index].target].y,
-            POSITIONS_TARGETS[GAME_CUBES[index].target].z
-          ).unproject(camera);
+    cubesDataRef.current.forEach((cube, index) => {
+      setTimeout(() => {
+        cube.targetPosition = new THREE.Vector3(
+          POSITIONS_TARGETS[GAME_CUBES[index].target].x,
+          POSITIONS_TARGETS[GAME_CUBES[index].target].y,
+          POSITIONS_TARGETS[GAME_CUBES[index].target].z
+        ).unproject(camera);
 
-          cube.direction
-            .subVectors(cube.targetPosition, START_CUBE_VECTOR)
-            .normalize();
-        }, GAME_CUBES[index].displayTime);
-      });
-    }
+        cube.direction
+          .subVectors(cube.targetPosition, START_CUBE_VECTOR)
+          .normalize();
+        cube.isVisible = true;
+      }, GAME_CUBES[index].displayTime);
+    });
   }, [camera]);
 
-  useFrame(() => {
-    if (cubeRefs.current) {
-      cubeRefs.current.forEach((cube) => {
-        if (!cube.ref) return;
-        const currentPosition = cube.ref.position;
+  console.log('cubesDataRef', cubesDataRef);
+  const frustum = new THREE.Frustum();
+  const cameraMatrix = new THREE.Matrix4().multiplyMatrices(
+    camera.projectionMatrix,
+    camera.matrixWorldInverse
+  );
+  frustum.setFromProjectionMatrix(cameraMatrix);
 
-        const frustum = new THREE.Frustum();
-        const cameraMatrix = new THREE.Matrix4().multiplyMatrices(
-          camera.projectionMatrix,
-          camera.matrixWorldInverse
+  useFrame(() => {
+    if (instanceRef.current) {
+      instanceRef.current.children.forEach((cube) => {
+        const cubeData = cubesDataRef.current.find(
+          (cubeData) => cube.name === `cube-${cubeData.id}`
         );
-        frustum.setFromProjectionMatrix(cameraMatrix);
+        if (!cubeData || !cubeData.isVisible) return;
+        const currentPosition = cube.position;
 
         if (!frustum.containsPoint(currentPosition)) {
-          scene.remove(cube.ref);
-          cube.ref = null; // Prevent further updates
+          // remove from scene
           return;
         }
 
-        const step = cube.direction.clone().multiplyScalar(GAME_DEFAULT_SPEED);
-        currentPosition.add(step);
+        const step = cubeData.direction
+          .clone()
+          .multiplyScalar(GAME_DEFAULT_SPEED);
+        cube.position.add(step);
         const distanceToTarget = currentPosition.distanceTo(
-          cube.targetPosition
+          cubeData.targetPosition
         );
 
-        if (distanceToTarget < 0.5 && !cube.hasPassedTarget) {
-          cube.hasPassedTarget = true;
-          cube.ref.material.color.set('green');
+        if (distanceToTarget < 0.5 && !cubeData.hasPassedTarget) {
+          cubesDataRef.current[cubeData.id].hasPassedTarget = true;
+          cube.color.set('green');
         }
-        if (distanceToTarget > 0.5 && cube.hasPassedTarget) {
-          cube.ref.material.color.set('red');
+        if (distanceToTarget > 0.5 && cubeData.hasPassedTarget) {
+          // cubesDataRef.current[cubeData.id].isVisible = false;
+          cube.color.set('red');
         }
       });
     }
@@ -94,23 +93,20 @@ export const Game = ({ videoRef }: GameProps) => {
   return (
     <>
       <Common videoRef={videoRef} />
-
-      {GAME_CUBES.map((cube, index) => (
-        <mesh
-          key={cube.id}
-          ref={(el) => {
-            if (el) {
-              cubeRefs.current[index].ref = el;
+      <Instances count={GAME_CUBES.length} ref={instanceRef}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshBasicMaterial />
+        {GAME_CUBES.map((cube) => (
+          <Instance
+            key={cube.id}
+            name={`cube-${cube.id}`}
+            position={START_CUBE_VECTOR.clone()}
+            color={
+              cubesDataRef.current[cube.id].hasPassedTarget ? 'green' : 'yellow'
             }
-          }}
-          position={START_CUBE_VECTOR.clone()}
-        >
-          <boxGeometry args={[1, 1, 1]} />
-          <meshBasicMaterial
-            color={cubeRefs.current[index].hasPassedTarget ? 'green' : 'yellow'}
           />
-        </mesh>
-      ))}
+        ))}
+      </Instances>
       <Targets />
     </>
   );
