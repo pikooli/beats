@@ -1,64 +1,90 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Common } from '@/components/canvas/Common';
 import { useLeva } from '@/components/useLeva';
-import { POSITIONS } from '@/constants';
+import {
+  POSITIONS_TARGETS,
+  START_CUBE_VECTOR,
+  GAME_DEFAULT_SPEED,
+} from '@/constants/common';
+import { Targets } from '@/components/canvas/meshs/Targets';
 
 interface GameProps {
   videoRef: React.RefObject<HTMLVideoElement>;
 }
 
 export const Game = ({ videoRef }: GameProps) => {
-  const { camera } = useThree();
+  const { camera, scene } = useThree();
   const { position } = useLeva();
-  const cubeRef = useRef<THREE.Mesh>(null);
-  const progressRef = useRef(0); // Start at 0 (0% progress)
 
-  const easeInOutQuad = (t: number) =>
-    t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  const cubeRef =
+    useRef<THREE.Mesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>>(null);
+
+  const directionRef = useRef(new THREE.Vector3());
+  const targetPositionRef = useRef(new THREE.Vector3());
+  const hasPassedTarget = useRef(false);
+
+  useEffect(() => {
+    if (cubeRef.current) {
+      targetPositionRef.current = new THREE.Vector3(
+        POSITIONS_TARGETS[3].x,
+        POSITIONS_TARGETS[3].y,
+        POSITIONS_TARGETS[3].z
+      ).unproject(camera);
+
+      directionRef.current
+        .subVectors(targetPositionRef.current, START_CUBE_VECTOR)
+        .normalize();
+    }
+  }, [camera]);
 
   useFrame(() => {
     if (cubeRef.current) {
-      const startPosition = new THREE.Vector3(0, 0, 0);
-      const targetPosition = new THREE.Vector3(0.75, 0.7, 0.98).unproject(
-        camera
+      const currentPosition = cubeRef.current.position;
+
+      const frustum = new THREE.Frustum();
+      const cameraMatrix = new THREE.Matrix4().multiplyMatrices(
+        camera.projectionMatrix,
+        camera.matrixWorldInverse
       );
-      const speed = 0.001;
+      frustum.setFromProjectionMatrix(cameraMatrix);
 
-      progressRef.current = Math.min(progressRef.current + speed, 1);
-      const easedProgress = easeInOutQuad(progressRef.current);
+      if (!frustum.containsPoint(currentPosition)) {
+        scene.remove(cubeRef.current);
+        cubeRef.current = null; // Prevent further updates
+        return;
+      }
 
-      cubeRef.current.position.lerpVectors(
-        startPosition,
-        targetPosition,
-        easedProgress
+      const step = directionRef.current
+        .clone()
+        .multiplyScalar(GAME_DEFAULT_SPEED);
+      currentPosition.add(step);
+      const distanceToTarget = currentPosition.distanceTo(
+        targetPositionRef.current
       );
 
-      const scale = THREE.MathUtils.lerp(0.1, 1, easedProgress); // Scale from 0.1 to 1
-      cubeRef.current.scale.set(scale, scale, scale);
+      if (distanceToTarget < 0.5 && !hasPassedTarget.current) {
+        hasPassedTarget.current = true;
+        cubeRef.current.material.color.set('green');
+      }
+      if (distanceToTarget > 0.5 && hasPassedTarget.current) {
+        hasPassedTarget.current = false;
+        cubeRef.current.material.color.set('red');
+      }
     }
   });
 
   return (
     <>
       <Common videoRef={videoRef} />
-
-      <mesh
-        ref={cubeRef}
-        position={new THREE.Vector3(position[0], position[1], position[2])}
-      >
+      <mesh name="cube" ref={cubeRef} position={START_CUBE_VECTOR.clone()}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshBasicMaterial color="red" />
+        <meshBasicMaterial
+          color={hasPassedTarget.current ? 'green' : 'yellow'}
+        />
       </mesh>
-      {/* {POSITIONS.map((position, index) => {
-        return (
-          <mesh key={index} position={position.unproject(camera)}>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshBasicMaterial color="red" />
-          </mesh>
-        );
-      })} */}
+      <Targets />
     </>
   );
 };

@@ -4,8 +4,8 @@ import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Perf } from 'r3f-perf';
 import * as THREE from 'three';
-import { CAMERA_FOV, Z_POSITION_CAMERA } from '@/constants';
-import { DEBUG } from '@/constants';
+import { CAMERA_FOV, Z_POSITION_CAMERA } from '@/constants/common';
+import { DEBUG } from '@/constants/debug';
 
 export const Common = ({
   videoRef,
