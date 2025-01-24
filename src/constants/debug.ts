@@ -1,6 +1,6 @@
 export const DEBUG = {
   showPerformance: true,
-  showLandmarks: false,
+  showLandmarks: true,
   showOrbitControls: true,
   showAxesHelper: false,
   showCameraHelper: false,

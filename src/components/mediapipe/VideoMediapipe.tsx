@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { MediapipeModel } from '@/components/videoMediapipe/model/mediapipe';
+import { MediapipeModel } from '@/components/mediapipe/model/mediapipe';
 
 interface VideoMediapipeProps {
   mediapipeRef: React.RefObject<MediapipeModel | null>;
@@ -23,7 +23,7 @@ export const VideoMediapipe = ({
       ref={videoRef}
       autoPlay
       playsInline
-      className={`h-screen`}
+      className={`hidden h-screen`}
     />
   );
 };

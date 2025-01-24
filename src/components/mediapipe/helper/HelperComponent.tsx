@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { HelperModel } from '@/components/videoMediapipe/helper/model/helperModel';
+import { HelperModel } from '@/components/mediapipe/helper/model/helperModel';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 
 interface HelperComponentProps {
