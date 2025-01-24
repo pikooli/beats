@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { Common } from '@/components/canvas/Common';
 // import { useLeva } from '@/components/useLeva';
 import {
-  POSITIONS_TARGETS,
+  CUBES_TARGETS,
   START_CUBE_VECTOR,
   GAME_DEFAULT_SPEED,
 } from '@/constants/common';
@@ -23,6 +23,7 @@ const CUBE_COLOR_UNHITTABLE = 'red';
 const defineCubesData = () => {
   return GAME_CUBES.map((cube) => ({
     id: cube.id,
+    targetId: cube.target,
     direction: new THREE.Vector3(),
     targetPosition: new THREE.Vector3(),
     hasPassedTarget: false,
@@ -47,18 +48,22 @@ export const Game = ({ videoRef }: GameProps) => {
   }, [camera]);
 
   useEffect(() => {
-    cubesDataRef.current.forEach((cube, index) => {
+    cubesDataRef.current.forEach((cubeData, index) => {
       setTimeout(() => {
-        cube.targetPosition = new THREE.Vector3(
-          POSITIONS_TARGETS[GAME_CUBES[index].target].x,
-          POSITIONS_TARGETS[GAME_CUBES[index].target].y,
-          POSITIONS_TARGETS[GAME_CUBES[index].target].z
+        const target = CUBES_TARGETS.find(
+          (target) => target.id === cubeData.targetId
+        );
+        if (!target) return;
+        cubeData.targetPosition = new THREE.Vector3(
+          target.x,
+          target.y,
+          target.z
         ).unproject(camera);
 
-        cube.direction
-          .subVectors(cube.targetPosition, START_CUBE_VECTOR)
+        cubeData.direction
+          .subVectors(cubeData.targetPosition, START_CUBE_VECTOR)
           .normalize();
-        cube.isVisible = true;
+        cubeData.isVisible = true;
       }, GAME_CUBES[index].displayTime);
     });
   }, [camera]);
@@ -107,7 +112,10 @@ export const Game = ({ videoRef }: GameProps) => {
             key={cube.id}
             name={`cube-${cube.id}`}
             position={START_CUBE_VECTOR.clone()}
-            color={CUBE_COLOR_DEFAULT}
+            color={
+              CUBES_TARGETS.find((target) => target.id === cube.target)
+                ?.color || CUBE_COLOR_DEFAULT
+            }
             userData={cubesDataRef.current.find(
               (cubeData) => cube.id === cubeData.id
             )}
