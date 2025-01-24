@@ -42,7 +42,7 @@ export const Common = ({
         makeDefault={true}
         fov={CAMERA_FOV}
         near={0.1}
-        far={1000000000000000}
+        far={100}
         position={new THREE.Vector3(0, 0, Z_POSITION_CAMERA)}
       />
     </Suspense>

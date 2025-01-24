@@ -4,6 +4,7 @@ import { Game } from '@/components/games/Game';
 import { View } from '@react-three/drei';
 import { useGameStore } from '@/zustand/store';
 import Mediapipe from '@/components/mediapipe/Mediapipe';
+import { Test } from '@/components/Test';
 
 export default function Home() {
   const { isGameStarted, setIsGameStarted } = useGameStore();
@@ -21,6 +22,7 @@ export default function Home() {
         <>
           <View className="absolute left-0 top-0 h-screen w-screen">
             <Game videoRef={videoRef} />
+            <Test />
           </View>
         </>
       ) : (
