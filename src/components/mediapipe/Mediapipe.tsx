@@ -22,9 +22,10 @@ export default function Mediapipe({
 
   useEffect(() => {
     if (isGameInited) {
-      mediapipeRef.current?.initUserMedia(setLandmarks, () => {
+      mediapipeRef.current?.initUserMedia(() => {
         setIsGameStarted(true);
         helperRef.current?.resizeCanvas(window.innerWidth, window.innerHeight);
+        mediapipeRef.current?.onMessage(setLandmarks);
       });
     }
   }, [isGameInited, setIsGameStarted, setLandmarks]);

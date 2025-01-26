@@ -1,10 +1,14 @@
 'use client';
 import { useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Game } from '@/components/games/Game';
 import { View } from '@react-three/drei';
 import { useGameStore } from '@/zustand/store';
-import Mediapipe from '@/components/mediapipe/Mediapipe';
 import { Test } from '@/components/Test';
+
+const Mediapipe = dynamic(() => import('@/components/mediapipe/Mediapipe'), {
+  ssr: false,
+});
 
 export default function Home() {
   const { isGameStarted, setIsGameStarted } = useGameStore();
