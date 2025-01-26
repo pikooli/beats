@@ -43,11 +43,8 @@ export const Game = ({ videoRef }: GameProps) => {
       camera.projectionMatrix,
       camera.matrixWorldInverse
     );
-
     frustumRef.current.setFromProjectionMatrix(cameraMatrix);
-  }, [camera]);
 
-  useEffect(() => {
     cubesDataRef.current.forEach((cubeData, index) => {
       setTimeout(() => {
         const target = CUBES_TARGETS.find(

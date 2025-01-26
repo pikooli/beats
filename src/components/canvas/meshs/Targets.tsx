@@ -6,6 +6,10 @@ import { Line, Instances, Instance } from '@react-three/drei';
 import { calculeBoundingBox } from '@/utils/calculeSize';
 import { useLandmarksStore } from '@/zustand/store';
 
+const PREFIX = 'target-';
+const COLLISION_THRESHOLD = 0.3;
+const POWER_FACTOR = 2;
+
 const Trajectory = () => {
   const { camera } = useThree();
   return (
@@ -34,13 +38,14 @@ export const Targets = () => {
   const { landmarks } = useLandmarksStore();
 
   useFrame(() => {
+    if (!landmarks?.landmarks.length) return;
     const { sizeY, sizeX, center } = calculeBoundingBox(
       landmarks?.landmarks[0] || null,
       camera
     );
     if (!sizeY || !sizeX || !center) return;
 
-    CUBES_TARGETS.forEach((target) => {
+    CUBES_TARGETS.forEach((target, index) => {
       const targetPosition = new THREE.Vector3(target.x, target.y, 0).unproject(
         camera
       );
@@ -49,14 +54,14 @@ export const Targets = () => {
       const centerNDC = center.clone().project(camera);
 
       const distance = Math.sqrt(
-        Math.pow(targetNDC.x - centerNDC.x, 2) +
-          Math.pow(targetNDC.y - centerNDC.y, 2)
+        Math.pow(targetNDC.x - centerNDC.x, POWER_FACTOR) +
+          Math.pow(targetNDC.y - centerNDC.y, POWER_FACTOR)
       );
 
-      const collisionThreshold = 0.3; // You can adjust this value
-
-      if (distance < collisionThreshold) {
-        console.log(`Collision detected with target ${target.id}`);
+      if (distance < COLLISION_THRESHOLD) {
+        if (targetsRef.current) {
+          targetsRef.current.setColorAt(index, new THREE.Color('green'));
+        }
       }
     });
   });
@@ -71,7 +76,7 @@ export const Targets = () => {
           return (
             <Instance
               key={position.id}
-              name={`target-${position.id}`}
+              name={`${PREFIX}${position.id}`}
               position={new THREE.Vector3(
                 position.x,
                 position.y,
