@@ -8,6 +8,7 @@ import {
   LIMIT_DISTANCE_HIT,
 } from '@/constants/common';
 import { GAME_CUBES, CUBES_TARGETS } from '@/constants/gameCube';
+import { useTargetsStore } from '@/zustand/store';
 
 const defineCubesData = () => {
   return GAME_CUBES.map((cube) => ({
@@ -28,6 +29,7 @@ export const useGame = () => {
   const frustumRef = useRef(new THREE.Frustum());
   const instanceRef = useRef<THREE.InstancedMesh>(null);
   const cubesDataRef = useRef(defineCubesData());
+  const { passingTargets } = useTargetsStore();
 
   useEffect(() => {
     const cameraMatrix = new THREE.Matrix4().multiplyMatrices(
@@ -57,6 +59,7 @@ export const useGame = () => {
   useFrame((state) => {
     if (instanceRef.current) {
       const elapsedTime = state.clock.getElapsedTime();
+
       instanceRef.current.children.forEach((cube) => {
         const cubeData = cube.userData;
         if (!cubeData.isVisible || cubeData.displayTime > elapsedTime) {
@@ -74,6 +77,7 @@ export const useGame = () => {
         const distanceToTarget = currentPosition.distanceTo(
           cubeData.targetPosition
         );
+
         if (
           distanceToTarget < LIMIT_DISTANCE_HIT &&
           !cubeData.hasPassedTarget
@@ -81,6 +85,13 @@ export const useGame = () => {
           cubesDataRef.current[cubeData.id].hasPassedTarget = true;
           // @ts-expect-error color is not a property of the cube
           cube.color.set(CUBE_COLOR_HITTABLE);
+          if (!passingTargets.has(cubeData.targetId)) {
+            passingTargets.add(cubeData.targetId);
+          }
+          return;
+        }
+        if (passingTargets.has(cubeData.targetId)) {
+          passingTargets.delete(cubeData.targetId);
         }
         if (distanceToTarget > LIMIT_DISTANCE_HIT && cubeData.hasPassedTarget) {
           // @ts-expect-error color is not a property of the cube

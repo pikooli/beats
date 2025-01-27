@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { create } from 'zustand';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
 
@@ -12,6 +11,18 @@ export const useGameStore = create<GameState>()((set) => ({
   setIsGameStarted: (isGameStarted) => set({ isGameStarted }),
 }));
 
+interface ScoreState {
+  score: number;
+  setScore: (score: number) => void;
+  addScore: (score: number) => void;
+}
+
+export const useScoreStore = create<ScoreState>()((set) => ({
+  score: 0,
+  setScore: (score) => set({ score }),
+  addScore: (score) => set((state) => ({ score: state.score + score })),
+}));
+
 interface LandmarksState {
   landmarks: HandLandmarkerResult | null;
   setLandmarks: (landmarks: HandLandmarkerResult | null) => void;
@@ -23,11 +34,9 @@ export const useLandmarksStore = create<LandmarksState>()((set) => ({
 }));
 
 interface TargetsState {
-  targets: THREE.InstancedMesh | null;
-  setTargets: (targets: THREE.InstancedMesh | null) => void;
+  passingTargets: Set<number>;
 }
 
-export const useTargetsStore = create<TargetsState>()((set) => ({
-  targets: null,
-  setTargets: (targets) => set({ targets }),
+export const useTargetsStore = create<TargetsState>()(() => ({
+  passingTargets: new Set(),
 }));

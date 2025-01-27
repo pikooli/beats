@@ -37,7 +37,8 @@ export const Game = ({ videoRef }: GameProps) => {
           />
         ))}
       </Instances>
-      <Targets activeTargetsRef={activeTargetsRef} />
+
+      <Targets />
     </>
   );
 };

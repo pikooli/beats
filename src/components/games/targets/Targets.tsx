@@ -9,8 +9,6 @@ import { useThree } from '@react-three/fiber';
 import { Line, Instances, Instance } from '@react-three/drei';
 import { useTargets } from '@/components/games/targets/useTargets';
 
-const PREFIX = 'target-';
-
 const Trajectory = () => {
   const { camera } = useThree();
   return (
