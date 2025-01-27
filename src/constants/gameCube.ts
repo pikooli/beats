@@ -6,8 +6,15 @@ interface GAME_CUBES {
   speed: number;
   displayTime: number;
 }
+interface GAME_TARGETS {
+  id: number;
+  x: number;
+  y: number;
+  z: number;
+  color: string;
+}
 
-export const CUBES_TARGETS = [
+export const CUBES_TARGETS: GAME_TARGETS[] = [
   { id: 0, x: -0.75, y: 0.7, z: Z_BASIC_OFFSET, color: '#FF5733' },
   { id: 1, x: -0.75, y: 0, z: Z_BASIC_OFFSET, color: '#33FF57' },
   { id: 2, x: -0.75, y: -0.7, z: Z_BASIC_OFFSET, color: '#3357FF' },

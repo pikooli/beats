@@ -12,6 +12,10 @@ export const LIMIT_DISTANCE_HIT = 0.5;
 export const TARGET_COLLISION_THRESHOLD = 0.3;
 export const POWER_FACTOR = 2;
 
+export const TARGET_PREFIX = 'target-';
+export const LINE_PREFIX = 'line-';
+export const CUBE_PREFIX = 'cube-';
+
 export const START_CUBE_VECTOR = new THREE.Vector3(
   0,
   0,

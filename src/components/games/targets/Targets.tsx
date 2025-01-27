@@ -1,5 +1,9 @@
 import * as THREE from 'three';
-import { START_CUBE_VECTOR } from '@/constants/common';
+import {
+  START_CUBE_VECTOR,
+  TARGET_PREFIX,
+  LINE_PREFIX,
+} from '@/constants/common';
 import { CUBES_TARGETS } from '@/constants/gameCube';
 import { useThree } from '@react-three/fiber';
 import { Line, Instances, Instance } from '@react-three/drei';
@@ -14,7 +18,7 @@ const Trajectory = () => {
       {CUBES_TARGETS.map((position) => {
         return (
           <Line
-            key={`line-${position.id}`}
+            key={`${LINE_PREFIX}${position.id}`}
             points={[
               START_CUBE_VECTOR,
               new THREE.Vector3(position.x, position.y, position.z).unproject(
@@ -43,7 +47,7 @@ export const Targets = () => {
           return (
             <Instance
               key={position.id}
-              name={`${PREFIX}${position.id}`}
+              name={`${TARGET_PREFIX}${position.id}`}
               position={new THREE.Vector3(
                 position.x,
                 position.y,

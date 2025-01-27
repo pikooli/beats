@@ -1,5 +1,9 @@
 import { Common } from '@/components/canvas/Common';
-import { START_CUBE_VECTOR, CUBE_COLOR_DEFAULT } from '@/constants/common';
+import {
+  START_CUBE_VECTOR,
+  CUBE_COLOR_DEFAULT,
+  CUBE_PREFIX,
+} from '@/constants/common';
 import { GAME_CUBES, CUBES_TARGETS } from '@/constants/gameCube';
 import { Targets } from '@/components/games/targets/Targets';
 import { Instances, Instance } from '@react-three/drei';
@@ -21,7 +25,7 @@ export const Game = ({ videoRef }: GameProps) => {
         {GAME_CUBES.map((cube) => (
           <Instance
             key={cube.id}
-            name={`cube-${cube.id}`}
+            name={`${CUBE_PREFIX}${cube.id}`}
             position={START_CUBE_VECTOR.clone()}
             color={
               CUBES_TARGETS.find((target) => target.id === cube.targetId)
@@ -33,7 +37,7 @@ export const Game = ({ videoRef }: GameProps) => {
           />
         ))}
       </Instances>
-      <Targets />
+      <Targets activeTargetsRef={activeTargetsRef} />
     </>
   );
 };
