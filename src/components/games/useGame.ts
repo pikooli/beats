@@ -89,7 +89,6 @@ export const useGame = () => {
           // @ts-expect-error color is not a property of the cube
           cube.color.set(CUBE_COLOR_HITTABLE);
           if (passingTargets.has(cubeData.targetId)) {
-            console.log('passingTargets', passingTargets);
             addScore(1);
             cube.scale.set(0, 0, 0);
             cubeData.status = CUBE_STATUS.HIT;
