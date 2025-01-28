@@ -6,6 +6,7 @@ import {
   CUBE_COLOR_HITTABLE,
   CUBE_COLOR_UNHITTABLE,
   LIMIT_DISTANCE_HIT,
+  START_DELAY,
 } from '@/constants/common';
 import { GAME_CUBES, CUBES_TARGETS, CUBE_STATUS } from '@/constants/gameCube';
 import { useTargetsStore, useScoreStore } from '@/zustand/store';
@@ -19,7 +20,7 @@ const defineCubesData = () => {
     hasPassedTarget: false,
     isVisible: true,
     step: new THREE.Vector3(),
-    displayTime: cube.displayTime,
+    displayTime: cube.displayTime + START_DELAY,
     speed: cube.speed,
     position: START_CUBE_VECTOR.clone(),
     status: CUBE_STATUS.IDLE,
