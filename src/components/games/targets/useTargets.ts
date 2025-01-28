@@ -15,11 +15,14 @@ export const useTargets = () => {
   useFrame(() => {
     if (!landmarks?.landmarks.length) return;
     passingTargets.clear();
-    landmarks?.landmarks.forEach((landmark) => {
+
+    for (let i = 0; i < landmarks.landmarks.length; i++) {
+      const landmark = landmarks.landmarks[i];
       const { sizeY, sizeX, center } = calculeBoundingBox(landmark, camera);
       if (!sizeY || !sizeX || !center) return;
 
-      CUBES_TARGETS.forEach((target, index) => {
+      for (let j = 0; j < CUBES_TARGETS.length; j++) {
+        const target = CUBES_TARGETS[j];
         const targetPosition = new THREE.Vector3(
           target.x,
           target.y,
@@ -36,14 +39,14 @@ export const useTargets = () => {
 
         if (distance < TARGET_COLLISION_THRESHOLD) {
           if (targetsRef.current) {
-            targetsRef.current.setColorAt(index, new THREE.Color('green'));
+            targetsRef.current.setColorAt(j, new THREE.Color('green'));
             if (!passingTargets.has(target.id)) {
               passingTargets.add(target.id);
             }
           }
         }
-      });
-    });
+      }
+    }
   });
 
   return { targetsRef };

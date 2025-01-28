@@ -63,17 +63,18 @@ export const useGame = () => {
     if (instanceRef.current) {
       const elapsedTime = state.clock.getElapsedTime();
 
-      instanceRef.current.children.forEach((cube) => {
+      for (let i = 0; i < instanceRef.current.children.length; i++) {
+        const cube = instanceRef.current.children[i];
         const cubeData = cube.userData;
         if (!cubeData.isVisible || cubeData.displayTime > elapsedTime) {
-          return;
+          continue;
         }
         const currentPosition = cube.position;
 
         if (!frustumRef.current.containsPoint(currentPosition)) {
           cube.scale.set(0, 0, 0);
           cubeData.isVisible = false;
-          return;
+          continue;
         }
         cubeData.position.add(cubeData.step);
         cube.position.copy(cubeData.position);
@@ -93,7 +94,7 @@ export const useGame = () => {
             cube.scale.set(0, 0, 0);
             cubeData.status = CUBE_STATUS.HIT;
           }
-          return;
+          continue;
         }
         if (distanceToTarget > LIMIT_DISTANCE_HIT && cubeData.hasPassedTarget) {
           // @ts-expect-error color is not a property of the cube
@@ -105,7 +106,7 @@ export const useGame = () => {
             cubeData.status = CUBE_STATUS.MISS;
           }
         }
-      });
+      }
     }
   });
 
