@@ -4,7 +4,8 @@ import dynamic from 'next/dynamic';
 import { Game } from '@/components/games/Game';
 import { View } from '@react-three/drei';
 import { useGameStore, useScoreStore } from '@/zustand/store';
-import { Test } from '@/components/Test';
+import { BoundingBox } from '@/components/canvas/meshs/BoundingBox';
+import { DEBUG } from '@/constants/debug';
 
 const Mediapipe = dynamic(() => import('@/components/mediapipe/Mediapipe'), {
   ssr: false,
@@ -36,7 +37,7 @@ export default function Home() {
         <>
           <View className="absolute left-0 top-0 h-screen w-screen">
             <Game videoRef={videoRef} />
-            <Test />
+            {DEBUG.showBoundingBox && <BoundingBox />}
           </View>
         </>
       ) : (

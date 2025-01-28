@@ -4,4 +4,5 @@ export const DEBUG = {
   showOrbitControls: true,
   showAxesHelper: false,
   showCameraHelper: false,
+  showBoundingBox: true,
 };

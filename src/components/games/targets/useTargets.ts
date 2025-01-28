@@ -13,8 +13,12 @@ export const useTargets = () => {
   const { landmarks } = useLandmarksStore();
 
   useFrame(() => {
-    if (!landmarks?.landmarks.length) return;
+    if (!landmarks?.landmarks.length || !targetsRef.current) return;
+
     passingTargets.clear();
+    targetsRef.current.children.forEach((child) => {
+      child.scale.set(1, 1, 1);
+    });
 
     for (let i = 0; i < landmarks.landmarks.length; i++) {
       const landmark = landmarks.landmarks[i];
@@ -38,11 +42,10 @@ export const useTargets = () => {
         );
 
         if (distance < TARGET_COLLISION_THRESHOLD) {
-          if (targetsRef.current) {
-            targetsRef.current.setColorAt(j, new THREE.Color('green'));
-            if (!passingTargets.has(target.id)) {
-              passingTargets.add(target.id);
-            }
+          targetsRef.current.setColorAt(j, new THREE.Color('green'));
+          targetsRef.current.children[j].scale.set(2, 2, 2);
+          if (!passingTargets.has(target.id)) {
+            passingTargets.add(target.id);
           }
         }
       }

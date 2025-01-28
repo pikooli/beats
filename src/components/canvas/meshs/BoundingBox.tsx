@@ -1,11 +1,11 @@
 'use client';
-
+import { useLandmarksStore } from '@/zustand/store';
 import { NormalizedLandmark } from '@mediapipe/tasks-vision';
 import { calculeBoundingBox } from '@/utils/calculeSize';
 import { Box } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 
-export const BoundingBox = ({
+export const BoundingMarker = ({
   landmarks,
 }: {
   landmarks: NormalizedLandmark[] | null;
@@ -23,5 +23,18 @@ export const BoundingBox = ({
         <meshBasicMaterial opacity={0.4} transparent={true} color="blue" />
       </Box>
     </mesh>
+  );
+};
+
+export const BoundingBox = () => {
+  const { landmarks } = useLandmarksStore();
+  if (!landmarks?.landmarks.length) return null;
+
+  return (
+    <>
+      {landmarks.landmarks.map((landmark, idx) => (
+        <BoundingMarker key={idx} landmarks={landmark} />
+      ))}
+    </>
   );
 };
