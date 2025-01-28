@@ -15,6 +15,7 @@ const Score = () => {
   return (
     <div className="absolute right-0 top-0 z-50 rounded-md bg-blue-500 p-4 text-black">
       Score: {score}
+      Missed: {}
     </div>
   );
 };
@@ -23,7 +24,6 @@ export default function Home() {
   const { isGameStarted, setIsGameStarted } = useGameStore();
   const [isGameInited, setIsGameInited] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  // const { score } = useScoreStore();
 
   return (
     <div className="h-screen">

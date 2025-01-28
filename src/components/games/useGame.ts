@@ -7,8 +7,8 @@ import {
   CUBE_COLOR_UNHITTABLE,
   LIMIT_DISTANCE_HIT,
 } from '@/constants/common';
-import { GAME_CUBES, CUBES_TARGETS } from '@/constants/gameCube';
-import { useTargetsStore } from '@/zustand/store';
+import { GAME_CUBES, CUBES_TARGETS, CUBE_STATUS } from '@/constants/gameCube';
+import { useTargetsStore, useScoreStore } from '@/zustand/store';
 
 const defineCubesData = () => {
   return GAME_CUBES.map((cube) => ({
@@ -21,6 +21,8 @@ const defineCubesData = () => {
     step: new THREE.Vector3(),
     displayTime: cube.displayTime,
     speed: cube.speed,
+    position: START_CUBE_VECTOR.clone(),
+    status: CUBE_STATUS.IDLE,
   }));
 };
 
@@ -30,6 +32,7 @@ export const useGame = () => {
   const instanceRef = useRef<THREE.InstancedMesh>(null);
   const cubesDataRef = useRef(defineCubesData());
   const { passingTargets } = useTargetsStore();
+  const { addScore } = useScoreStore();
 
   useEffect(() => {
     const cameraMatrix = new THREE.Matrix4().multiplyMatrices(
@@ -72,8 +75,8 @@ export const useGame = () => {
           cubeData.isVisible = false;
           return;
         }
-
-        cube.position.add(cubeData.step);
+        cubeData.position.add(cubeData.step);
+        cube.position.copy(cubeData.position);
         const distanceToTarget = currentPosition.distanceTo(
           cubeData.targetPosition
         );
@@ -82,20 +85,26 @@ export const useGame = () => {
           distanceToTarget < LIMIT_DISTANCE_HIT &&
           !cubeData.hasPassedTarget
         ) {
-          cubesDataRef.current[cubeData.id].hasPassedTarget = true;
+          cubeData.hasPassedTarget = true;
           // @ts-expect-error color is not a property of the cube
           cube.color.set(CUBE_COLOR_HITTABLE);
-          if (!passingTargets.has(cubeData.targetId)) {
-            passingTargets.add(cubeData.targetId);
+          if (passingTargets.has(cubeData.targetId)) {
+            console.log('passingTargets', passingTargets);
+            addScore(1);
+            cube.scale.set(0, 0, 0);
+            cubeData.status = CUBE_STATUS.HIT;
           }
           return;
-        }
-        if (passingTargets.has(cubeData.targetId)) {
-          passingTargets.delete(cubeData.targetId);
         }
         if (distanceToTarget > LIMIT_DISTANCE_HIT && cubeData.hasPassedTarget) {
           // @ts-expect-error color is not a property of the cube
           cube.color.set(CUBE_COLOR_UNHITTABLE);
+          if (
+            cubeData.status !== CUBE_STATUS.MISS &&
+            cubeData.status !== CUBE_STATUS.HIT
+          ) {
+            cubeData.status = CUBE_STATUS.MISS;
+          }
         }
       });
     }

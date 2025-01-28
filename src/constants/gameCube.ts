@@ -32,3 +32,10 @@ export const GAME_CUBES: GAME_CUBES[] = [
   { id: 5, targetId: 5, speed: 0.04, displayTime: 6 },
   { id: 6, targetId: 3, speed: 0.04, displayTime: 6 },
 ];
+
+export const CUBE_STATUS = {
+  IDLE: 'idle',
+  MOVING: 'moving',
+  HIT: 'hit',
+  MISS: 'miss',
+} as const;

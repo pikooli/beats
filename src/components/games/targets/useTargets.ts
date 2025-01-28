@@ -3,11 +3,7 @@ import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { TARGET_COLLISION_THRESHOLD, POWER_FACTOR } from '@/constants/common';
 import { CUBES_TARGETS } from '@/constants/gameCube';
-import {
-  useLandmarksStore,
-  useScoreStore,
-  useTargetsStore,
-} from '@/zustand/store';
+import { useLandmarksStore, useTargetsStore } from '@/zustand/store';
 import { calculeBoundingBox } from '@/utils/calculeSize';
 
 export const useTargets = () => {
@@ -15,7 +11,6 @@ export const useTargets = () => {
   const { passingTargets } = useTargetsStore();
   const { camera } = useThree();
   const { landmarks } = useLandmarksStore();
-  const { addScore } = useScoreStore();
 
   useFrame(() => {
     if (!landmarks?.landmarks.length) return;
@@ -41,11 +36,14 @@ export const useTargets = () => {
       if (distance < TARGET_COLLISION_THRESHOLD) {
         if (targetsRef.current) {
           targetsRef.current.setColorAt(index, new THREE.Color('green'));
+          if (!passingTargets.has(target.id)) {
+            passingTargets.add(target.id);
+          }
         }
+      } else {
         if (passingTargets.has(target.id)) {
-          addScore(1);
+          passingTargets.delete(target.id);
         }
-        return;
       }
     });
   });
