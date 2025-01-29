@@ -40,3 +40,20 @@ interface TargetsState {
 export const useTargetsStore = create<TargetsState>()(() => ({
   passingTargets: new Set(),
 }));
+
+interface SoundState {
+  playSound: (sound: string) => void;
+}
+
+export const useSoundStore = create<SoundState>()(() => ({
+  playSound: (sound) => {
+    switch (sound) {
+      case 'hit':
+        const audio = new Audio('hit.mp3');
+        audio.play();
+        break;
+      default:
+        break;
+    }
+  },
+}));

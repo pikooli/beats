@@ -13,13 +13,13 @@ export const useTargets = () => {
   const { landmarks } = useLandmarksStore();
 
   useFrame(() => {
-    if (!landmarks?.landmarks.length || !targetsRef.current) return;
-
+    if (!targetsRef.current) return;
     passingTargets.clear();
     targetsRef.current.children.forEach((child) => {
       child.scale.set(1, 1, 1);
     });
 
+    if (!landmarks?.landmarks.length) return;
     for (let i = 0; i < landmarks.landmarks.length; i++) {
       const landmark = landmarks.landmarks[i];
       const { sizeY, sizeX, center } = calculeBoundingBox(landmark, camera);

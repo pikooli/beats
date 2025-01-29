@@ -9,7 +9,7 @@ import {
   START_DELAY,
 } from '@/constants/common';
 import { GAME_CUBES, CUBES_TARGETS, CUBE_STATUS } from '@/constants/gameCube';
-import { useTargetsStore, useScoreStore } from '@/zustand/store';
+import { useTargetsStore, useScoreStore, useSoundStore } from '@/zustand/store';
 
 const defineCubesData = () => {
   return GAME_CUBES.map((cube) => ({
@@ -34,6 +34,7 @@ export const useGame = () => {
   const cubesDataRef = useRef(defineCubesData());
   const { passingTargets } = useTargetsStore();
   const { addScore } = useScoreStore();
+  const { playSound } = useSoundStore();
 
   useEffect(() => {
     const cameraMatrix = new THREE.Matrix4().multiplyMatrices(
@@ -93,6 +94,7 @@ export const useGame = () => {
           if (passingTargets.has(cubeData.targetId)) {
             addScore(1);
             cube.scale.set(0, 0, 0);
+            playSound('hit');
             cubeData.status = CUBE_STATUS.HIT;
           }
           continue;
