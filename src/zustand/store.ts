@@ -1,14 +1,28 @@
+'use client';
+
+import * as THREE from 'three';
 import { create } from 'zustand';
 import { HandLandmarkerResult } from '@mediapipe/tasks-vision';
+import { MUSIC_NAME } from '@/constants/common';
 
 interface GameState {
   isGameStarted: boolean;
+  gameState: 'start' | 'pause' | 'idle';
   setIsGameStarted: (isGameStarted: boolean) => void;
+  setGameState: (gameState: 'start' | 'pause' | 'idle') => void;
 }
 
 export const useGameStore = create<GameState>()((set) => ({
   isGameStarted: false,
-  setIsGameStarted: (isGameStarted) => set({ isGameStarted }),
+  gameState: 'idle',
+  setIsGameStarted: (isGameStarted) => {
+    set({ isGameStarted });
+    useMusicStore.getState().startMusic();
+    useTimeStore.getState().startTime();
+  },
+  setGameState: (gameState) => {
+    set({ gameState });
+  },
 }));
 
 interface ScoreState {
@@ -54,6 +68,81 @@ export const useSoundStore = create<SoundState>()(() => ({
         break;
       default:
         break;
+    }
+  },
+}));
+
+interface MusicState {
+  music: HTMLAudioElement | null;
+  triggerMusic: () => void;
+  resetMusic: () => void;
+  startMusic: () => void;
+}
+
+export const useMusicStore = create<MusicState>()((set, get) => ({
+  music: null,
+  startMusic: () => {
+    const { music } = get();
+    if (!music) {
+      const newMusic = new Audio(MUSIC_NAME);
+      set({ music: newMusic });
+      newMusic.play();
+      return;
+    }
+    if (music.paused) {
+      music.play();
+    }
+  },
+  triggerMusic: () => {
+    const { music } = get();
+    if (!music) {
+      const newMusic = new Audio(MUSIC_NAME);
+      set({ music: newMusic });
+      newMusic.play();
+      return;
+    }
+    if (music.paused) {
+      music.play();
+    } else {
+      music.pause();
+    }
+  },
+  resetMusic: () => {
+    const { music } = get();
+    if (!music) return;
+    music.currentTime = 0;
+  },
+}));
+
+interface TimeState {
+  time: THREE.Clock;
+  isPaused: boolean;
+  pauseStartTime: number;
+  totalPausedTime: number;
+  triggerTime: () => void;
+  startTime: () => void;
+}
+
+export const useTimeStore = create<TimeState>()((set, get) => ({
+  time: new THREE.Clock(),
+  isPaused: false,
+  pauseStartTime: 0,
+  totalPausedTime: 0,
+  startTime: () => {
+    get().time?.start();
+  },
+  triggerTime: () => {
+    const { isPaused, pauseStartTime, totalPausedTime, time } = get();
+    if (!isPaused) {
+      set({ isPaused: true, pauseStartTime: time.getElapsedTime() });
+    } else {
+      const newTotalPausedTime =
+        totalPausedTime + time.getElapsedTime() - pauseStartTime;
+      set({
+        isPaused: false,
+        totalPausedTime: newTotalPausedTime,
+        pauseStartTime: 0,
+      });
     }
   },
 }));

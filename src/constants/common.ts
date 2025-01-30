@@ -28,3 +28,4 @@ export const GAME_DEFAULT_SPEED = 0.04;
 export const CUBE_COLOR_DEFAULT = 'yellow';
 export const CUBE_COLOR_HITTABLE = 'green';
 export const CUBE_COLOR_UNHITTABLE = 'red';
+export const MUSIC_NAME = 'Daft Punk - Harder, Better, Faster, Stronger.mp3';

@@ -9,7 +9,7 @@ import {
   START_DELAY,
 } from '@/constants/common';
 import { GAME_CUBES, CUBES_TARGETS, CUBE_STATUS } from '@/constants/gameCube';
-import { useTargetsStore, useScoreStore, useSoundStore } from '@/zustand/store';
+import { useTargetsStore, useScoreStore, useTimeStore } from '@/zustand/store';
 
 const defineCubesData = () => {
   return GAME_CUBES.map((cube) => ({
@@ -34,7 +34,7 @@ export const useGame = () => {
   const cubesDataRef = useRef(defineCubesData());
   const { passingTargets } = useTargetsStore();
   const { addScore } = useScoreStore();
-  const { playSound } = useSoundStore();
+  const { totalPausedTime, isPaused, time } = useTimeStore();
 
   useEffect(() => {
     const cameraMatrix = new THREE.Matrix4().multiplyMatrices(
@@ -61,9 +61,9 @@ export const useGame = () => {
     });
   }, [camera]);
 
-  useFrame((state) => {
-    if (instanceRef.current) {
-      const elapsedTime = state.clock.getElapsedTime();
+  useFrame(() => {
+    if (instanceRef.current && !isPaused) {
+      const elapsedTime = time.getElapsedTime() - totalPausedTime;
 
       for (let i = 0; i < instanceRef.current.children.length; i++) {
         const cube = instanceRef.current.children[i];
@@ -94,7 +94,8 @@ export const useGame = () => {
           if (passingTargets.has(cubeData.targetId)) {
             addScore(1);
             cube.scale.set(0, 0, 0);
-            playSound('hit');
+            // TODO: fix this
+            // playSound('hit');
             cubeData.status = CUBE_STATUS.HIT;
           }
           continue;

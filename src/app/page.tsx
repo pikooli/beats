@@ -3,7 +3,12 @@ import { useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Game } from '@/components/games/Game';
 import { View } from '@react-three/drei';
-import { useGameStore, useScoreStore } from '@/zustand/store';
+import {
+  useGameStore,
+  useScoreStore,
+  useMusicStore,
+  useTimeStore,
+} from '@/zustand/store';
 import { BoundingBox } from '@/components/canvas/meshs/BoundingBox';
 import { DEBUG } from '@/constants/debug';
 
@@ -13,9 +18,19 @@ const Mediapipe = dynamic(() => import('@/components/mediapipe/Mediapipe'), {
 
 const Score = () => {
   const { score } = useScoreStore();
+  const { triggerMusic } = useMusicStore();
+  const { triggerTime } = useTimeStore();
   return (
     <div className="absolute right-0 top-0 z-50 rounded-md bg-blue-500 p-4 text-black">
       Score: {score}
+      <button
+        onClick={() => {
+          triggerMusic();
+          triggerTime();
+        }}
+      >
+        Play/Pause Music
+      </button>
     </div>
   );
 };
@@ -43,7 +58,9 @@ export default function Home() {
       ) : (
         <button
           className="absolute left-1/2 top-1/2 z-50 rounded-md bg-blue-500 p-4 text-white"
-          onClick={() => setIsGameInited(true)}
+          onClick={() => {
+            setIsGameInited(true);
+          }}
         >
           Start Game
         </button>
