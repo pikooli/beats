@@ -32,6 +32,7 @@ export const useGame = () => {
   const frustumRef = useRef(new THREE.Frustum());
   const instanceRef = useRef<THREE.InstancedMesh>(null);
   const cubesDataRef = useRef(defineCubesData());
+  const removedCubesRef = useRef<number[]>([]);
   const { passingTargets } = useTargetsStore();
   const { addScore } = useScoreStore();
   const { totalPausedTime, isPaused, time } = useTimeStore();
@@ -63,8 +64,14 @@ export const useGame = () => {
 
   useFrame(() => {
     if (instanceRef.current && !isPaused) {
+      console.log('instanceRef.current', instanceRef.current.children.length);
+      if (removedCubesRef.current.length > 0) {
+        instanceRef.current.children = instanceRef.current.children.filter(
+          (cube) => !removedCubesRef.current.includes(cube.id)
+        );
+        removedCubesRef.current = [];
+      }
       const elapsedTime = time.getElapsedTime() - totalPausedTime;
-
       for (let i = 0; i < instanceRef.current.children.length; i++) {
         const cube = instanceRef.current.children[i];
         const cubeData = cube.userData;
@@ -72,10 +79,10 @@ export const useGame = () => {
           continue;
         }
         const currentPosition = cube.position;
-
         if (!frustumRef.current.containsPoint(currentPosition)) {
           cube.scale.set(0, 0, 0);
           cubeData.isVisible = false;
+          removedCubesRef.current.push(cube.id);
           continue;
         }
         cubeData.position.add(cubeData.step);
@@ -97,6 +104,7 @@ export const useGame = () => {
             // TODO: fix this
             // playSound('hit');
             cubeData.status = CUBE_STATUS.HIT;
+            removedCubesRef.current.push(cube.id);
           }
           continue;
         }
