@@ -4,7 +4,8 @@ import {
   CUBE_COLOR_DEFAULT,
   CUBE_PREFIX,
 } from '@/constants/common';
-import { GAME_CUBES, CUBES_TARGETS } from '@/constants/gameCube';
+import { CUBES_TARGETS } from '@/constants/gameCube';
+import { GAME_CUBES } from '@/constants/cubeNote';
 import { Targets } from '@/components/games/targets/Targets';
 import { Instances, Instance } from '@react-three/drei';
 import { useGame } from './useGame';

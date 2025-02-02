@@ -1,26 +1,52 @@
 import { Z_BASIC_OFFSET } from './common';
+import type { GAME_TARGETS_TYPE, GAME_CUBES_TYPE } from '@/types/game';
 
-interface GAME_CUBES {
-  id: number;
-  targetId: number;
-  speed: number;
-  displayTime: number;
-}
-interface GAME_TARGETS {
-  id: number;
-  x: number;
-  y: number;
-  z: number;
-  color: string;
-}
+const CUBES_TARGETS_Y = 0.4;
+const CUBES_TARGETS_X = 0.65;
 
-export const CUBES_TARGETS: GAME_TARGETS[] = [
-  { id: 0, x: -0.75, y: 0.7, z: Z_BASIC_OFFSET, color: '#FF5733' },
-  { id: 1, x: -0.75, y: 0, z: Z_BASIC_OFFSET, color: '#33FF57' },
-  { id: 2, x: -0.75, y: -0.7, z: Z_BASIC_OFFSET, color: '#3357FF' },
-  { id: 3, x: 0.75, y: 0.7, z: Z_BASIC_OFFSET, color: '#FF33A1' },
-  { id: 4, x: 0.75, y: 0, z: Z_BASIC_OFFSET, color: '#A133FF' },
-  { id: 5, x: 0.75, y: -0.7, z: Z_BASIC_OFFSET, color: '#33FFA1' },
+// this have a issue, as center elements don't have a y value, the distance is a little less than other targets
+// export const CUBES_TARGETS: GAME_TARGETS[] = [
+//   {     name: 'left-top', id: 0, x: -0.75, y: 0.7, z: Z_BASIC_OFFSET, color: '#FF5733' },
+//   {     name: 'left-center', id: 1, x: -0.75, y: 0, z: Z_BASIC_OFFSET, color: '#33FF57' },
+//   {     name: 'left-bottom', id: 2, x: -0.75, y: -0.7, z: Z_BASIC_OFFSET, color: '#3357FF' },
+//   {     name: 'right-top', id: 3, x: 0.75, y: 0.7, z: Z_BASIC_OFFSET, color: '#FF33A1' },
+//   {     name: 'right-center', id: 4, x: 0.75, y: 0, z: Z_BASIC_OFFSET, color: '#A133FF' },
+//   {     name: 'right-bottom', id: 5, x: 0.75, y: -0.7, z: Z_BASIC_OFFSET, color: '#33FFA1' },
+// ] as const;
+
+export const CUBES_TARGETS: GAME_TARGETS_TYPE[] = [
+  {
+    name: 'left-top',
+    id: 0,
+    x: -CUBES_TARGETS_X,
+    y: CUBES_TARGETS_Y,
+    z: Z_BASIC_OFFSET,
+    color: '#FF5733',
+  },
+  {
+    name: 'left-bottom',
+    id: 1,
+    x: -CUBES_TARGETS_X,
+    y: -CUBES_TARGETS_Y,
+    z: Z_BASIC_OFFSET,
+    color: '#3357FF',
+  },
+  {
+    name: 'right-top',
+    id: 2,
+    x: CUBES_TARGETS_X,
+    y: CUBES_TARGETS_Y,
+    z: Z_BASIC_OFFSET,
+    color: '#FF33A1',
+  },
+  {
+    name: 'right-bottom',
+    id: 3,
+    x: CUBES_TARGETS_X,
+    y: -CUBES_TARGETS_Y,
+    z: Z_BASIC_OFFSET,
+    color: '#33FFA1',
+  },
 ] as const;
 
 // export const GAME_CUBES: GAME_CUBES[] = [
@@ -33,7 +59,7 @@ export const CUBES_TARGETS: GAME_TARGETS[] = [
 //   { id: 6, targetId: 3, speed: 0.04, displayTime: 6 },
 // ];
 
-export const GAME_CUBES: GAME_CUBES[] = [
+export const GAME_CUBES: GAME_CUBES_TYPE[] = [
   // **Intro (0:00 - 0:35)**
   { id: 0, targetId: 1, speed: 0.02, displayTime: 2 }, // Soft start
   { id: 1, targetId: 4, speed: 0.02, displayTime: 4 },

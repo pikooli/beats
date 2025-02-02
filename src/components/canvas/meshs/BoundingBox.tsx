@@ -28,7 +28,7 @@ export const BoundingMarker = ({
 
 export const BoundingBox = () => {
   const { landmarks } = useLandmarksStore();
-  if (!landmarks?.landmarks.length) return null;
+  if (!landmarks?.landmarks?.length) return null;
 
   return (
     <>

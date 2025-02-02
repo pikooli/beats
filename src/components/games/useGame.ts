@@ -8,7 +8,8 @@ import {
   LIMIT_DISTANCE_HIT,
   START_DELAY,
 } from '@/constants/common';
-import { GAME_CUBES, CUBES_TARGETS, CUBE_STATUS } from '@/constants/gameCube';
+import { CUBES_TARGETS, CUBE_STATUS } from '@/constants/gameCube';
+import { GAME_CUBES } from '@/constants/cubeNote';
 import { useTargetsStore, useScoreStore, useTimeStore } from '@/zustand/store';
 
 const defineCubesData = () => {
@@ -64,7 +65,6 @@ export const useGame = () => {
 
   useFrame(() => {
     if (instanceRef.current && !isPaused) {
-      console.log('instanceRef.current', instanceRef.current.children.length);
       if (removedCubesRef.current.length > 0) {
         instanceRef.current.children = instanceRef.current.children.filter(
           (cube) => !removedCubesRef.current.includes(cube.id)
